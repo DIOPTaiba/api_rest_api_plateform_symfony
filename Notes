@@ -1,0 +1,66 @@
+#installation de api platform
+    $ composer req api
+
+#Erreur installation de api platform :
+    $  In DoctrineOrmPropertyMetadataFactory.php line 31:
+    !!                                                                                 
+    !!    Argument 1 passed to ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property  
+    !!    \DoctrineOrmPropertyMetadataFactory::__construct() must be an instance of D  
+    !!    octrine\Common\Persistence\ManagerRegistry, instance of Doctrine\Bundle\Doc  
+    !!    trineBundle\Registry given, called in /opt/lampp/htdocs/mesprojets/api_rest  
+    !!    _api_plateform_symfony/var/cache/dev/ContainerMi3QpKX/App_KernelDevDebugCon  
+    !!    tainer.php on line 1522  
+
+# Solution :
+    -Dans le fichier composerjson mettre les 2 lignes suivantes après symfony/symfony
+         "doctrine/common": ">=3.0",
+        "doctrine/persistence": "<1.3"
+        Ensuite faire un $composer update
+
+    - Ou dans le fichier vendor/api-platform/core/bridge/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactory.php 
+    remplacer "use Doctrine\Common\Persistence\ManagerRegistry;" par "use Symfony\Bridge\Doctrine\ManagerRegistry;"
+
+   @Référence : --> https://stackoverflow.com/a/63600219/14170887
+
+# Après installation on démarre le serveur PHP intégré:
+    $ php -S 127.0.0.1:8000 -t public
+    - ou le serveur de symfony
+    $symfony server:start
+
+# Pour accéder à l'appli on mettre
+    -Vous devez ouvrir http://localhost:8000/api/
+
+#Si vous déployez API Platform directement sur un serveur Web Apache ou NGINX et obtenez une 
+    erreur 404 à l'ouverture de ce lien https://symfony.com/doc/current/setup/web_server_configuration.html, vous devrez activer les règles de réécriture pour votre 
+    logiciel de serveur Web spécifique.
+
+# Configuration Symfony :
+    - configuration de la base de donnée dans le fichier .env 
+        DATABASE_URL=mysql://root(nom_utilisateur ici root):(ici mdp si définit)@127.0.0.1:3306/api_rest_api_platform_symfony?serverVersion=mariadb-10.4.8(ici la version de maria db)
+
+
+# Après configuration de infos de la base de données on peut à partir d'une base de donnée existante avec la commande
+    $php bin/console doctrine:mapping:import "App\Entity" annotation --path=src/Entity
+
+    - Aprèe dans src/Entity on retrouve toutes les entités de notre base de données
+
+# Après la création des entités on génère les getteurs et setteurs
+    $php bin/console make:entity --regenerate App
+
+    #Apres on met les @ApiResource pour les opérations (GET, POST, PUT, DELETE) en faisant un use de
+     -> use ApiPlatform\Core\Annotation\ApiResource;
+
+        /**
+        * 
+    ->  * @ApiResource()
+        *
+        *..
+
+
+
+
+            [Pour projet symfony sans API]
+# Après configuration on cré d'abord les controllers avec la commande :
+    $php bin/console make:controller nomcontrollerController
+        -le nom du controller doit être suivi par controller
+    
