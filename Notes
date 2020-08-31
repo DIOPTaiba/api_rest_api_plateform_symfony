@@ -71,6 +71,30 @@
         normalizationContexte={}, (pour la lecture)
         denormalizationContexte={} (pour l'écriture)
 
+        //on peut définir plusieurs groupes avec des noms différents 
+        normalizationContext={"groups"={"getSolde:read", "getOperations:read"}},
+        denormalizationContext={"groups"={"getSolde:write"}},
+
+    # Après définition des groupes on les applique sur les champs quéon veut recupérer
+        @Groups({"getSolde:read", "getOperations:read"})
+        */
+        private $numeroCompte;
+        
+        -ici j'applique les 2 groupes sur le champs $numeroCompte pour le recupérer suivant la
+        -recherche de solde ou d'opérations
+
+    #Au niveau de opérations pour fair une recherche selon un champs qui se trouve dans compte (numeroCompte)
+    on fait une concaténation entre ce champs (numeroCompte) et la clé étrangère (id_compte_source):
+         @ApiFilter(SearchFilter::class, properties={"id_compte_source.numeroCompte": "exact"})
+
+    -Puis dans Comptes on définit le même groupe et on l'appelle sur les champs qu'on veut recupérer
+        normalizationContext={"groups"={"getSolde:read", "getOperations:read"}},
+        @Groups({"getSolde:read", "getOperations:read"})
+        */
+        private $numeroCompte;
+
+
+    
 
             [Pour projet symfony sans API]
 # Après configuration on cré d'abord les controllers avec la commande :
@@ -84,45 +108,3 @@
     $
     
 
-
-
-
-
-@ ApiResource(
- *     normalizationContext={"groups"={"operations:read"}},
- *     denormalizationContext={"groups"={"operations:write"}},
- *     collectionOperations={
- *          "get"={},
- *          "post"={},
- *     },
- *     itemOperations={
- *          "get"={},
- *          "put"={},
- *          "delete"={},
- * }
- * )
-
- 
-
-
-    /* /**
-     * @var \Comptes
-     *
-     * @ORM\ManyToOne(targetEntity="Comptes")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id_compte_source", referencedColumnName="id")
-     * })
-     * @Groups"=({"operations:read"})
-     * /
-    private $idCompteSource;
-
-    /**
-     * @var \Comptes
-     *
-     * @ORM\ManyToOne(targetEntity="Comptes")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id_compte_destinataire", referencedColumnName="id")
-     * })
-     * @Groups"=({"operations:read"})
-     * /
-    private $idCompteDestinataire; */
