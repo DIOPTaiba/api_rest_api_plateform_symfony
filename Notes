@@ -42,7 +42,7 @@
 # Après configuration de infos de la base de données on peut à partir d'une base de donnée existante avec la commande
     $php bin/console doctrine:mapping:import "App\Entity" annotation --path=src/Entity
 
-    - Aprèe dans src/Entity on retrouve toutes les entités de notre base de données
+    - Après dans src/Entity on retrouve toutes les entités de notre base de données
 
 # Après la création des entités on génère les getteurs et setteurs
     $php bin/console make:entity --regenerate App
@@ -56,11 +56,73 @@
         *
         *..
 
+    #On peut choisir les méthodes qu'on veut utiliser avec itemOperations
+        @ApiResource(
+        *     collectionOperations={"get"},
+        *     itemOperations={
+        *     "get"={},
+        *     "put"={},
+        *     "delete"={}
+        * }
+        * )
 
+    # On utilise les normaliseurs qui nous permettent d'autoriser certaines  lectures ou écritures des propriétés
+    normalizer
+        normalizationContexte={}, (pour la lecture)
+        denormalizationContexte={} (pour l'écriture)
 
 
             [Pour projet symfony sans API]
 # Après configuration on cré d'abord les controllers avec la commande :
     $php bin/console make:controller nomcontrollerController
         -le nom du controller doit être suivi par controller
+
+# Pour créer des entités on met
+    $php bin/console make:Entity
+
+# Pour faire la migration vers la base de données on met
+    $
     
+
+
+
+
+
+@ ApiResource(
+ *     normalizationContext={"groups"={"operations:read"}},
+ *     denormalizationContext={"groups"={"operations:write"}},
+ *     collectionOperations={
+ *          "get"={},
+ *          "post"={},
+ *     },
+ *     itemOperations={
+ *          "get"={},
+ *          "put"={},
+ *          "delete"={},
+ * }
+ * )
+
+ 
+
+
+    /* /**
+     * @var \Comptes
+     *
+     * @ORM\ManyToOne(targetEntity="Comptes")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="id_compte_source", referencedColumnName="id")
+     * })
+     * @Groups"=({"operations:read"})
+     * /
+    private $idCompteSource;
+
+    /**
+     * @var \Comptes
+     *
+     * @ORM\ManyToOne(targetEntity="Comptes")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="id_compte_destinataire", referencedColumnName="id")
+     * })
+     * @Groups"=({"operations:read"})
+     * /
+    private $idCompteDestinataire; */

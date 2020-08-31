@@ -5,10 +5,26 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Comptes
  *
+ * @ApiResource(
+ * 
+ *     normalizationContext={"groups"={"operations:read"}},
+ *     denormalizationContext={"groups"={"operations:write"}},
+ *     collectionOperations={
+ *          "get"={},
+ *          "post"={},
+ *     },
+ *     itemOperations={
+ *          "get"={},
+ *          "put"={},
+ *          "delete"={},
+ *      }
+ * )
  * @ORM\Table(name="comptes", indexes={@ORM\Index(name="IDX_56735801DE558704", columns={"id_clients"})})
  * @ORM\Entity
  */
@@ -20,6 +36,7 @@ class Comptes
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups({"operations:read"})
      */
     private $id;
 
@@ -27,6 +44,7 @@ class Comptes
      * @var string
      *
      * @ORM\Column(name="numero_compte", type="string", length=255, nullable=false)
+     * @Groups({"operations:read"})
      */
     private $numeroCompte;
 
@@ -84,11 +102,23 @@ class Comptes
     private $etatcompte;
 
     /**
+     * @ORM\OneToMany(targetEntity=Operations::class, mappedBy="id_compte_source", orphanRemoval=true)
+     */
+    private $id_operation_source;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Operations::class, mappedBy="id_compte_destinataire")
+     */
+    private $id_operation_destinataire;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->etatcompte = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->id_operation_source = new ArrayCollection();
+        $this->id_operation_destinataire = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -189,6 +219,68 @@ class Comptes
     {
         if ($this->etatcompte->contains($etatcompte)) {
             $this->etatcompte->removeElement($etatcompte);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Operations[]
+     */
+    public function getIdOperationSource(): Collection
+    {
+        return $this->id_operation_source;
+    }
+
+    public function addIdOperationSource(Operations $idOperationSource): self
+    {
+        if (!$this->id_operation_source->contains($idOperationSource)) {
+            $this->id_operation_source[] = $idOperationSource;
+            $idOperationSource->setIdCompteSource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdOperationSource(Operations $idOperationSource): self
+    {
+        if ($this->id_operation_source->contains($idOperationSource)) {
+            $this->id_operation_source->removeElement($idOperationSource);
+            // set the owning side to null (unless already changed)
+            if ($idOperationSource->getIdCompteSource() === $this) {
+                $idOperationSource->setIdCompteSource(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Operations[]
+     */
+    public function getIdOperationDestinataire(): Collection
+    {
+        return $this->id_operation_destinataire;
+    }
+
+    public function addIdOperationDestinataire(Operations $idOperationDestinataire): self
+    {
+        if (!$this->id_operation_destinataire->contains($idOperationDestinataire)) {
+            $this->id_operation_destinataire[] = $idOperationDestinataire;
+            $idOperationDestinataire->setIdCompteDestinataire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIdOperationDestinataire(Operations $idOperationDestinataire): self
+    {
+        if ($this->id_operation_destinataire->contains($idOperationDestinataire)) {
+            $this->id_operation_destinataire->removeElement($idOperationDestinataire);
+            // set the owning side to null (unless already changed)
+            if ($idOperationDestinataire->getIdCompteDestinataire() === $this) {
+                $idOperationDestinataire->setIdCompteDestinataire(null);
+            }
         }
 
         return $this;
