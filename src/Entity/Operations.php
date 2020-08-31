@@ -5,13 +5,15 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * Operations
  * 
  * @ApiResource(
- *     normalizationContext={"groups"={"operations:read"}},
- *     denormalizationContext={"groups"={"operations:write"}},
+ *     normalizationContext={"groups"={"getOperations:read"}},
+ *     denormalizationContext={"groups"={"getOperations:write"}},
  *     collectionOperations={
  *          "get"={},
  *          "post"={},
@@ -22,6 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "delete"={},
  *      }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"id_compte_source.numeroCompte": "exact"})
  * @ORM\Table(name="operations")
  * @ORM\Entity
  */
@@ -33,7 +36,7 @@ class Operations
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"operations:read"})
+     * @Groups({"getOperations:read"})
      */
     private $id;
 
@@ -41,7 +44,7 @@ class Operations
      * @var string
      *
      * @ORM\Column(name="type_operation", type="string", length=255, nullable=false)
-     * @Groups({"operations:read"})
+     * @Groups({"getOperations:read"})
      */
     private $typeOperation;
 
@@ -49,7 +52,7 @@ class Operations
      * @var int
      *
      * @ORM\Column(name="montant", type="integer", nullable=false)
-     * @Groups({"operations:read"})
+     * @Groups({"getOperations:read"})
      */
     private $montant;
 
@@ -57,20 +60,19 @@ class Operations
      * @var \DateTime
      *
      * @ORM\Column(name="date_operation", type="datetime", nullable=false)
-     * @Groups({"operations:read"})
+     * @Groups({"getOperations:read"})
      */
     private $dateOperation;
 
     /**
      * @ORM\ManyToOne(targetEntity=Comptes::class, inversedBy="id_operation_source")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"operations:read"})
+     * @Groups({"getOperations:read"})
      */
     private $id_compte_source;
 
     /**
      * @ORM\ManyToOne(targetEntity=Comptes::class, inversedBy="id_operation_destinataire")
-     * @Groups({"operations:read"})
      */
     private $id_compte_destinataire;
 

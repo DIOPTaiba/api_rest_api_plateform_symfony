@@ -7,14 +7,16 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * Comptes
  *
  * @ApiResource(
  * 
- *     normalizationContext={"groups"={"operations:read"}},
- *     denormalizationContext={"groups"={"operations:write"}},
+ *     normalizationContext={"groups"={"getSolde:read", "getOperations:read"}},
+ *     denormalizationContext={"groups"={"getSolde:write"}},
  *     collectionOperations={
  *          "get"={},
  *          "post"={},
@@ -25,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "delete"={},
  *      }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"numeroCompte": "exact"})
  * @ORM\Table(name="comptes", indexes={@ORM\Index(name="IDX_56735801DE558704", columns={"id_clients"})})
  * @ORM\Entity
  */
@@ -36,7 +39,6 @@ class Comptes
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"operations:read"})
      */
     private $id;
 
@@ -44,7 +46,7 @@ class Comptes
      * @var string
      *
      * @ORM\Column(name="numero_compte", type="string", length=255, nullable=false)
-     * @Groups({"operations:read"})
+     * @Groups({"getSolde:read", "getOperations:read"})
      */
     private $numeroCompte;
 
@@ -59,6 +61,7 @@ class Comptes
      * @var string
      *
      * @ORM\Column(name="solde", type="decimal", precision=10, scale=0, nullable=false)
+     * @Groups({"getSolde:read"})
      */
     private $solde;
 
@@ -66,6 +69,7 @@ class Comptes
      * @var \DateTime
      *
      * @ORM\Column(name="date_ouverture", type="datetime", nullable=false)
+     * 
      */
     private $dateOuverture;
 
@@ -103,11 +107,13 @@ class Comptes
 
     /**
      * @ORM\OneToMany(targetEntity=Operations::class, mappedBy="id_compte_source", orphanRemoval=true)
+     * 
      */
     private $id_operation_source;
 
     /**
      * @ORM\OneToMany(targetEntity=Operations::class, mappedBy="id_compte_destinataire")
+     * 
      */
     private $id_operation_destinataire;
 
